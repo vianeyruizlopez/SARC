@@ -37,6 +37,9 @@ dependencies {
     implementation(libs.postgresql)
     implementation(libs.hikaricp)
 
+    ///claudinary
+    implementation("com.cloudinary:cloudinary-http5:2.0.0")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     // Serialization
     implementation(libs.ktor.serialization.kotlinx.json)
     //implementation("io.ktor:ktor-server-content-negotiation-jvm")

@@ -18,7 +18,7 @@ object DatabaseFactory {
             driverClassName = "org.postgresql.Driver"
 
             // Leemos del .env. Si no existe, usamos un valor por defecto (el ?: "...")
-            jdbcUrl = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/sarc_db"
+            jdbcUrl = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/SARC-2"
             username = System.getenv("DB_USER") ?: "postgres"
             password = System.getenv("DB_PASSWORD") ?: "root"
 
