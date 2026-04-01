@@ -1,32 +1,32 @@
 package com.alilopez.modules.reportes.infrastructure.rest.dto
 
 
-import com.alilopez.modules.reportes.domain.model.reporte
+import com.alilopez.modules.reportes.domain.model.Reporte
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ReporteResponse (
-    val id: Int,
+    val id_reporte: Int,
+    val id_usuario: Int,
+    val id_incidencia: Int,
     val titulo: String,
     val descripcion: String,
-    val imagen: String,
     val latitud: Double,
     val longitud: Double,
-    val fechaReporte: String,
-    val idEstado: Int,
-    val idIncidencia: Int,
-    val idUsuario: Int
+    val id_estado: Int,
+    val imagen: String?,
+    val fecha: String
 )
 
-fun reporte.toResponse() = ReporteResponse (
-    id = id ?: 0,
+fun Reporte.toResponse() = ReporteResponse (
+    id_reporte = id_reporte ?: 0,
+    id_usuario = id_usuario,
+    id_incidencia = id_incidencia,
     titulo = titulo,
     descripcion = descripcion,
-    imagen = imagen,
     latitud = latitud,
     longitud = longitud,
-    fechaReporte = fechaReporte.toString(),
-    idEstado = idEstado,
-    idIncidencia = idIncidencia,
-    idUsuario = idUsuario
+    id_estado = id_estado,
+    imagen = imagen,
+    fecha = fecha?.toString() ?: ""
 )

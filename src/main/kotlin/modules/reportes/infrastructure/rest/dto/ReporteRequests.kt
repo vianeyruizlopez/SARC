@@ -1,29 +1,28 @@
 package com.alilopez.modules.reportes.infrastructure.rest.dto
 
-import com.alilopez.modules.reportes.domain.model.reporte
+import com.alilopez.modules.reportes.domain.model.Reporte
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
 data class CreateReporteRequest(
+    val id_usuario: Int,
+    val id_incidencia: Int,
     val titulo: String,
     val descripcion: String,
-    val imagen: String,
     val latitud: Double,
     val longitud: Double,
-    val idIncidencia: Int,
-    val idUsuario: Int
+    val id_estado: Int = 1,
+    val imagen: String? = null
 ) {
-    fun toDomain() = reporte(
-        id = null,
+    fun toDomain() = Reporte(
+        id_usuario = id_usuario,
+        id_incidencia = id_incidencia,
         titulo = titulo,
         descripcion = descripcion,
-        imagen = imagen,
         latitud = latitud,
         longitud = longitud,
-        fechaReporte = LocalDateTime.now(),
-        idEstado = 1,
-        idIncidencia = idIncidencia,
-        idUsuario = idUsuario
+        id_estado = id_estado,
+        imagen = imagen
     )
 }
