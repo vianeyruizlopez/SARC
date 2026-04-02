@@ -18,6 +18,7 @@ object reporteTable : Table("reporte") {
     val idUsuario = integer("id_usuario").references(UsuarioTable.id)
     val idIncidencia = integer("id_incidencia").references(IncidenciaTable.id)
     val idEstado = integer("id_estado").references(EstadoReporteTable.id).default(1)
+    val ubicacion = varchar("ubicacion", 255).nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

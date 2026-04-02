@@ -1,19 +1,27 @@
 package com.alilopez.modules.reportes.infrastructure.persistence
 
+import com.alilopez.modules.catalogos.infrastructure.persistence.EstadoReporteTable
+import com.alilopez.modules.catalogos.infrastructure.persistence.IncidenciaTable
 import com.alilopez.modules.reportes.domain.model.Reporte
 import com.alilopez.modules.reportes.domain.repository.ReporteRepository
+import com.alilopez.modules.usuarios.infrastructure.persistence.UsuarioTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class PostgresReporteRepository : ReporteRepository {
 
+    private val reporteConNombres = reporteTable
+        .innerJoin(IncidenciaTable, { reporteTable.idIncidencia }, { IncidenciaTable.id })
+        .innerJoin(EstadoReporteTable, { reporteTable.idEstado }, { EstadoReporteTable.id })
+        .innerJoin(UsuarioTable, { reporteTable.idUsuario }, { UsuarioTable.id })
+
     override suspend fun buscarTodos(): List<Reporte> = transaction {
-        reporteTable.selectAll().map { it.toDomain() }
+        reporteConNombres.selectAll().map { it.toDomain() }
     }
 
     override suspend fun buscarPorId(id: Int): Reporte? = transaction {
-        reporteTable.select { reporteTable.id eq id }
+        reporteConNombres.select { reporteTable.id eq id }
             .map { it.toDomain() }
             .singleOrNull()
     }
@@ -28,6 +36,7 @@ class PostgresReporteRepository : ReporteRepository {
             it[longitud] = nuevoReporte.longitud.toBigDecimal()
             it[idEstado] = nuevoReporte.id_estado
             it[imagen] = nuevoReporte.imagen
+            it[ubicacion] = nuevoReporte.ubicacion
         } get reporteTable.id
 
         nuevoReporte.copy(id_reporte = idGenerado)
@@ -42,6 +51,7 @@ class PostgresReporteRepository : ReporteRepository {
             it[longitud] = reporte.longitud.toBigDecimal()
             it[idEstado] = reporte.id_estado
             it[imagen] = reporte.imagen
+            it[ubicacion] = reporte.ubicacion
         }
         if (filasAfectadas > 0) reporte else null
     }
@@ -57,19 +67,23 @@ class PostgresReporteRepository : ReporteRepository {
     }
 
     override suspend fun buscarPorUsuario(idUsuario: Int): List<Reporte> = transaction {
-        reporteTable.select { reporteTable.idUsuario eq idUsuario }
+        reporteConNombres.select { reporteTable.idUsuario eq idUsuario }
             .map { it.toDomain() }
     }
 
     private fun ResultRow.toDomain() = Reporte(
         id_reporte = this[reporteTable.id],
         id_usuario = this[reporteTable.idUsuario],
+        nombreUsuario = this[UsuarioTable.nombre],
         id_incidencia = this[reporteTable.idIncidencia],
+        nombreIncidencia = this[IncidenciaTable.nombre],
         titulo = this[reporteTable.titulo],
         descripcion = this[reporteTable.descripcion],
+        ubicacion = this[reporteTable.ubicacion],
         latitud = this[reporteTable.latitud].toDouble(),
         longitud = this[reporteTable.longitud].toDouble(),
         id_estado = this[reporteTable.idEstado],
+        nombreEstado = this[EstadoReporteTable.nombre],
         imagen = this[reporteTable.imagen],
         fecha = this[reporteTable.fechaReporte]
     )
