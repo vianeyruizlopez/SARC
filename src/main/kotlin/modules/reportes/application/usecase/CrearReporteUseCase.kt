@@ -6,7 +6,7 @@ import com.alilopez.modules.reportes.domain.repository.ReporteRepository
 class CrearReporteUseCase(private val repository: ReporteRepository) {
 
     suspend fun execute(nuevoReporte: Reporte): Reporte {
-        val reportesExistentes = repository.buscarTodos()
+        val reportesExistentes = repository.buscarTodos(null)
 
         val duplicado = reportesExistentes.find { r ->
             r.latitud == nuevoReporte.latitud &&

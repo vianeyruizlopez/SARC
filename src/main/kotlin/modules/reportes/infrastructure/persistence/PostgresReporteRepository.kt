@@ -16,8 +16,14 @@ class PostgresReporteRepository : ReporteRepository {
         .innerJoin(EstadoReporteTable, { reporteTable.idEstado }, { EstadoReporteTable.id })
         .innerJoin(UsuarioTable, { reporteTable.idUsuario }, { UsuarioTable.id })
 
-    override suspend fun buscarTodos(): List<Reporte> = transaction {
-        reporteConNombres.selectAll().map { it.toDomain() }
+    override suspend fun buscarTodos(idEstado: Int?): List<Reporte> = transaction {
+        val query = if (idEstado != null) {
+            reporteConNombres.select { reporteTable.idEstado eq idEstado }
+        } else {
+            reporteConNombres.selectAll()
+        }
+
+        query.map { it.toDomain() }
     }
 
     override suspend fun buscarPorId(id: Int): Reporte? = transaction {
@@ -68,9 +74,13 @@ class PostgresReporteRepository : ReporteRepository {
         reporteTable.deleteWhere { reporteTable.id eq id } > 0
     }
 
-    override suspend fun buscarPorUsuario(idUsuario: Int): List<Reporte> = transaction {
-        reporteConNombres.select { reporteTable.idUsuario eq idUsuario }
-            .map { it.toDomain() }
+    override suspend fun buscarPorUsuario(idUsuario: Int, idEstado: Int?): List<Reporte> = transaction {
+        val query = reporteConNombres.select { reporteTable.idUsuario eq idUsuario }
+        idEstado?.let {
+            query.andWhere { reporteTable.idEstado eq it }
+        }
+
+        query.map { it.toDomain() }
     }
 
     private fun ResultRow.toDomain() = Reporte(

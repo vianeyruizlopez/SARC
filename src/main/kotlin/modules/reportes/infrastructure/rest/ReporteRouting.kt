@@ -32,12 +32,13 @@ fun Route.reporteRouting() {
             get {
                 val principal = call.principal<JWTPrincipal>()
                 val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+                val estadoFiltro = call.request.queryParameters["estado"]?.toIntOrNull()
 
-                if (rol == 1 || rol == 3) {
-                    val reportes = verReporteUseCase.execute()
+                try {
+                    val reportes = verReporteUseCase.execute(rol, estadoFiltro)
                     call.respond(HttpStatusCode.OK, reportes.map { it.toResponse() })
-                } else {
-                    call.respond(HttpStatusCode.Forbidden, "Solo administradores pueden ver todos los reportes")
+                } catch (e: IllegalAccessException) {
+                    call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
                 }
             }
 
@@ -91,16 +92,19 @@ fun Route.reporteRouting() {
                 val principal = call.principal<JWTPrincipal>()
                 val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
 
-                if (rol == 2) {
-                    val id = call.parameters["idUsuario"]?.toIntOrNull()
-                    if (id == null) {
-                        call.respond(HttpStatusCode.BadRequest, "ID de usuario no válido")
-                        return@get
-                    }
-                    val misReportes = verPorUsuarioUseCase.execute(id)
+                val idUsuarioPath = call.parameters["idUsuario"]?.toIntOrNull()
+                val estadoFiltro = call.request.queryParameters["estado"]?.toIntOrNull()
+
+                if (idUsuarioPath == null) {
+                    call.respond(HttpStatusCode.BadRequest, "ID de usuario no válido")
+                    return@get
+                }
+
+                try {
+                    val misReportes = verPorUsuarioUseCase.execute(idUsuarioPath, rol, estadoFiltro)
                     call.respond(HttpStatusCode.OK, misReportes.map { it.toResponse() })
-                } else {
-                    call.respond(HttpStatusCode.Forbidden, "Acceso denegado")
+                } catch (e: IllegalAccessException) {
+                    call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
                 }
             }
 
