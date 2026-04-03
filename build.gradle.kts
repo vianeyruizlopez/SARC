@@ -44,4 +44,10 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     //implementation("io.ktor:ktor-server-content-negotiation-jvm")
     //implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
+    ///token y firebase
+    ///token y firebase
+    implementation("com.google.firebase:firebase-admin:9.3.0")
+    implementation("io.ktor:ktor-server-auth-jwt:2.3.12")
+    //// implementation("io.ktor:ktor-server-auth-jwt:2.3.12")
+   ////// implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
 }
