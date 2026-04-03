@@ -9,8 +9,15 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 class PostgresUsuarioRepository : UsuarioRepository {
 
+    private fun UsuariosConRoles() = UsuarioTable.join(
+        RolTable,
+        joinType = JoinType.INNER,
+        onColumn = UsuarioTable.idRol,
+        otherColumn = RolTable.id
+    )
+
     override suspend fun verTodos(): List<Usuario> = newSuspendedTransaction {
-        (UsuarioTable innerJoin RolTable)
+        UsuariosConRoles()
             .selectAll()
             .map { toDomainConRol(it) }
     }
@@ -18,14 +25,14 @@ class PostgresUsuarioRepository : UsuarioRepository {
 
 
     override suspend fun verPorId(id: Int): Usuario? = newSuspendedTransaction {
-        (UsuarioTable innerJoin RolTable)
+        UsuariosConRoles()
             .select { UsuarioTable.id eq id }
             .map { toDomainConRol(it) }
             .singleOrNull()
     }
 
     override suspend fun verPorEmail(email: String): Usuario? = newSuspendedTransaction {
-        (UsuarioTable innerJoin RolTable)
+        UsuariosConRoles()
             .select { UsuarioTable.email eq email }
             .map { toDomainConRol(it) }
             .singleOrNull()
@@ -42,7 +49,10 @@ class PostgresUsuarioRepository : UsuarioRepository {
             it[idRol] = usuario.idRol
         }[UsuarioTable.id]
 
-        verPorId(nuevoId)
+        UsuariosConRoles()
+            .select { UsuarioTable.id eq nuevoId }
+            .map { toDomainConRol(it) }
+            .singleOrNull()
     }
 
     override suspend fun actualizar(id: Int, usuario: Usuario): Usuario? = newSuspendedTransaction {

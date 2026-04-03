@@ -1,5 +1,8 @@
 package com.alilopez.modules.usuarios.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Usuario(
     val id: Int? = null,
     val nombre: String,
@@ -8,7 +11,7 @@ data class Usuario(
     val email: String,
     val contrasena: String? = null,
     val googleId: String? = null,
-    val edad: Int,
+    val edad: Int? = null,
     val idRol: Int,
     val nombreRol: String? = null
 )

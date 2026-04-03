@@ -3,6 +3,7 @@ package com.alilopez.modules.usuarios.infrastructure.rest
 import LoginUseCase
 import com.alilopez.modules.usuarios.application.usecase.*
 import com.alilopez.modules.usuarios.domain.model.Usuario
+import com.alilopez.modules.usuarios.infrastructure.rest.dto.LoginRequest
 import com.alilopez.modules.usuarios.infrastructure.rest.dto.toResponse
 import io.ktor.http.*
 import io.ktor.server.auth.*
@@ -12,6 +13,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
+import com.alilopez.modules.usuarios.infrastructure.rest.dto.GoogleLoginRequest
 
 fun Route.usuarioRouting() {
     val actualizarUseCase by inject<ActualizarUseCase>()
@@ -26,11 +28,22 @@ fun Route.usuarioRouting() {
         post("/google") {
             val request = call.receive<GoogleLoginRequest>()
             val token = loginUseCase.execute(
-                email = "ejemplo@gmail.com", // TODO: Cambiar por email real de Firebase
+                email = request.email,
                 googleId = request.idToken,
-                nombre = "Usuario Google"
+                nombre = request.nombre
             )
             call.respond(mapOf("token" to token))
+        }
+
+        post("/login") {
+            val request = call.receive<LoginRequest>()
+            val token = loginUseCase.loginTradicional(request.email, request.contrasena)
+
+            if (token != null) {
+                call.respond(mapOf("token" to token))
+            } else {
+                call.respond(HttpStatusCode.Unauthorized, "Correo o contraseña incorrectos")
+            }
         }
 
         post("/register") {
@@ -64,7 +77,11 @@ fun Route.usuarioRouting() {
 
             post("/admin") {
                 val principal = call.principal<JWTPrincipal>()
-                val rolEjecutor = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+                val rolEjecutor = principal?.payload?.getClaim("idRol")?.asInt()
+                    ?: principal?.payload?.getClaim("rol")?.asInt()
+                    ?: 0
+
+                println("TOKEN LOG: El rol detectado es $rolEjecutor")
 
                 val nuevoAdminData = call.receive<Usuario>()
                 val resultado = registrarAdminUseCase.execute(nuevoAdminData, rolEjecutor)
@@ -72,10 +89,9 @@ fun Route.usuarioRouting() {
                 if (resultado != null) {
                     call.respond(HttpStatusCode.Created, resultado.toResponse())
                 } else {
-                    call.respond(HttpStatusCode.Forbidden, mapOf("error" to "No tienes permisos de SuperAdmin"))
+                    call.respond(HttpStatusCode.Forbidden, mapOf("error" to "No tienes permisos. Tu rol es: $rolEjecutor"))
                 }
             }
-
             get("/staff") {
                 val principal = call.principal<JWTPrincipal>()
                 val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
@@ -133,5 +149,3 @@ fun Route.usuarioRouting() {
     }
 }
 
-@Serializable
-data class GoogleLoginRequest(val idToken: String)

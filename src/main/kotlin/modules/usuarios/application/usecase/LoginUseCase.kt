@@ -24,11 +24,20 @@ class LoginUseCase(
                 idRol = rolAsignado,
                 primerApellido = "",
                 segundoApellido = "",
-                edad = 0
+                edad = null
             )
             usuario = registrarUseCase.execute(nuevoUsuario)
         }
 
         return JwtConfig.generateToken(usuario!!)
     }
+    suspend fun loginTradicional(email: String, contrasena: String): String? {
+        val usuario = repository.verPorEmail(email)
+
+        if (usuario != null && usuario.contrasena == contrasena) {
+            return JwtConfig.generateToken(usuario)
+        }
+        return null
+    }
+
 }

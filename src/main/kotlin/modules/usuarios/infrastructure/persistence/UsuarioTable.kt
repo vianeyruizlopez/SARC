@@ -10,7 +10,7 @@ object UsuarioTable : Table("usuario") {
     val email = varchar("email", 200)
     val contrasena = varchar("contrasena", 255).nullable()
     val googleId = varchar("google_id", 255).nullable()
-    val edad = integer("edad")
+    val edad = integer("edad").nullable()
     val idRol = integer("id_rol")
 
     override val primaryKey = PrimaryKey(id)

@@ -12,7 +12,7 @@ data class UsuarioResponse(
     val email: String,
     val contrasena: String?,
     val googleId: String?,
-    val edad: Int,
+    val edad: Int?,
     val idRol: Int,
     val nombreRol: String
 )
