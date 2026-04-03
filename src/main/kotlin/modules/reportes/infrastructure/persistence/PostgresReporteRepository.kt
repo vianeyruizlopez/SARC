@@ -39,7 +39,9 @@ class PostgresReporteRepository : ReporteRepository {
             it[ubicacion] = nuevoReporte.ubicacion
         } get reporteTable.id
 
-        nuevoReporte.copy(id_reporte = idGenerado)
+        reporteConNombres.select { reporteTable.id eq idGenerado }
+            .map { it.toDomain() }
+            .single()
     }
 
     override suspend fun actualizar(id: Int, reporte: Reporte): Reporte? = transaction {
