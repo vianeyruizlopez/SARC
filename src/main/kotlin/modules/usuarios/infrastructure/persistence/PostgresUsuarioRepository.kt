@@ -3,9 +3,11 @@ package com.alilopez.modules.usuarios.infrastructure.persistence
 import com.alilopez.modules.catalogosRol.infrastructure.persistence.RolTable
 import com.alilopez.modules.usuarios.domain.model.Usuario
 import com.alilopez.modules.usuarios.domain.repository.UsuarioRepository
+import com.alilopez.modules.usuarios.infrastructure.rest.dto.UsuarioEstadisticasResponse
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.transactions.transaction
 
 class PostgresUsuarioRepository : UsuarioRepository {
 
@@ -37,6 +39,20 @@ class PostgresUsuarioRepository : UsuarioRepository {
             .map { toDomainConRol(it) }
             .singleOrNull()
     }
+
+    override suspend fun obtenerEstadisticasUsuarios(): UsuarioEstadisticasResponse = transaction {
+        val total = UsuarioTable.selectAll().count()
+
+        val admins = UsuarioTable.select {
+            (UsuarioTable.idRol eq 1) or (UsuarioTable.idRol eq 3)
+        }.count()
+        val ciudadanos = UsuarioTable.select {
+            UsuarioTable.idRol eq 2
+        }.count()
+
+        UsuarioEstadisticasResponse(total, admins, ciudadanos)
+    }
+
     override suspend fun registrar(usuario: Usuario): Usuario? = newSuspendedTransaction {
         val nuevoId = UsuarioTable.insert {
             it[nombre] = usuario.nombre

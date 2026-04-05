@@ -4,6 +4,7 @@ import com.alilopez.modules.catalogos.infrastructure.persistence.EstadoReporteTa
 import com.alilopez.modules.catalogos.infrastructure.persistence.IncidenciaTable
 import com.alilopez.modules.reportes.domain.model.Reporte
 import com.alilopez.modules.reportes.domain.repository.ReporteRepository
+import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteEstadisticasResponse
 import com.alilopez.modules.usuarios.infrastructure.persistence.UsuarioTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -81,6 +82,24 @@ class PostgresReporteRepository : ReporteRepository {
         }
 
         query.map { it.toDomain() }
+    }
+
+    override suspend fun obtenerEstadisticasUsuario(idUsuario: Int): ReporteEstadisticasResponse = transaction {
+        val total = reporteTable.select { reporteTable.idUsuario eq idUsuario }.count()
+        val pendientes = reporteTable.select { (reporteTable.idUsuario eq idUsuario) and (reporteTable.idEstado eq 1) }.count()
+        val enProceso = reporteTable.select { (reporteTable.idUsuario eq idUsuario) and (reporteTable.idEstado eq 2) }.count()
+        val resueltos = reporteTable.select { (reporteTable.idUsuario eq idUsuario) and (reporteTable.idEstado eq 3) }.count()
+
+        ReporteEstadisticasResponse(total, pendientes, enProceso, resueltos)
+    }
+
+    override suspend fun obtenerEstadisticasGlobales(): ReporteEstadisticasResponse = transaction {
+        val total = reporteTable.selectAll().count()
+        val pendientes = reporteTable.select { reporteTable.idEstado eq 1 }.count()
+        val enProceso = reporteTable.select { reporteTable.idEstado eq 2 }.count()
+        val resueltos = reporteTable.select { reporteTable.idEstado eq 3 }.count()
+
+        ReporteEstadisticasResponse(total, pendientes, enProceso, resueltos)
     }
 
     private fun ResultRow.toDomain() = Reporte(

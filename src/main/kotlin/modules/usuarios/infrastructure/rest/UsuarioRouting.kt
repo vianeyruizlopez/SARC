@@ -1,6 +1,7 @@
 package com.alilopez.modules.usuarios.infrastructure.rest
 
 import LoginUseCase
+import com.alilopez.modules.reportes.application.usecase.VerEstadisticasUsuarioUseCase
 import com.alilopez.modules.usuarios.application.usecase.*
 import com.alilopez.modules.usuarios.domain.model.Usuario
 import com.alilopez.modules.usuarios.infrastructure.rest.dto.LoginRequest
@@ -14,6 +15,7 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import com.alilopez.modules.usuarios.infrastructure.rest.dto.GoogleLoginRequest
+import com.alilopez.modules.usuarios.application.usecase.VerEstadisticasUsuariosUseCase
 
 fun Route.usuarioRouting() {
     val actualizarUseCase by inject<ActualizarUseCase>()
@@ -23,6 +25,7 @@ fun Route.usuarioRouting() {
     val registrarUseCase by inject<RegistrarUseCase>()
     val verPerfilUseCase by inject <VerPerfilUseCase>()
     val verTodoUseCase by inject<VerTodoUseCase>()
+    val verEstadisticasUsuariosUseCase by inject<VerEstadisticasUsuariosUseCase>()
     route("/auth") {
 
         post("/google") {
@@ -72,6 +75,22 @@ fun Route.usuarioRouting() {
                     call.respond(HttpStatusCode.OK, usuario.toResponse())
                 } else {
                     call.respond(HttpStatusCode.NotFound, "Usuario no encontrado")
+                }
+            }
+
+            get("/estadisticas/conteo") {
+                val principal = call.principal<JWTPrincipal>()
+                val rol = principal?.payload?.getClaim("idRol")?.asInt()
+                    ?: principal?.payload?.getClaim("rol")?.asInt()
+                    ?: 0
+
+                println("DEBUG: Rol extraído del token = $rol")
+
+                try {
+                    val estadisticas = verEstadisticasUsuariosUseCase.execute(rol)
+                    call.respond(HttpStatusCode.OK, estadisticas)
+                } catch (e: IllegalAccessException) {
+                    call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
                 }
             }
 

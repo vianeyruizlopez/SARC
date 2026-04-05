@@ -23,6 +23,8 @@ fun Route.reporteRouting() {
     val eliminarReporteUseCase by inject<EliminarReporteUseCase>()
     val verPorUsuarioUseCase by inject<VerReportesPorUsuarioUseCase>()
     val actualizarEstadoUseCase by inject<ActualizarEstadoUseCase>()
+    val verEstadisticasUsuarioUseCase by inject<VerEstadisticasUsuarioUseCase>()
+    val verEstadisticasGlobalesUseCase by inject<VerEstadisticasGlobalesUseCase>()
 
     val cloudinaryService = CloudinaryService()
 
@@ -103,6 +105,37 @@ fun Route.reporteRouting() {
                 try {
                     val misReportes = verPorUsuarioUseCase.execute(idUsuarioPath, rol, estadoFiltro)
                     call.respond(HttpStatusCode.OK, misReportes.map { it.toResponse() })
+                } catch (e: IllegalAccessException) {
+                    call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
+                }
+            }
+
+            get("/usuario/{idUsuario}/estadisticas") {
+                val principal = call.principal<JWTPrincipal>()
+                val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+                val idUsuarioPath = call.parameters["idUsuario"]?.toIntOrNull()
+
+                if (idUsuarioPath == null) {
+                    call.respond(HttpStatusCode.BadRequest, "ID de usuario inválido")
+                    return@get
+                }
+
+                try {
+                    val estadisticas = verEstadisticasUsuarioUseCase.execute(idUsuarioPath, rol)
+                    call.respond(HttpStatusCode.OK, estadisticas)
+                } catch (e: IllegalAccessException) {
+                    call.respond(HttpStatusCode.Forbidden, e.message ?: "Error de acceso")
+                }
+            }
+
+
+            get("/estadisticas/global") {
+                val principal = call.principal<JWTPrincipal>()
+                val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+
+                try {
+                    val estadisticas = verEstadisticasGlobalesUseCase.execute(rol)
+                    call.respond(HttpStatusCode.OK, estadisticas)
                 } catch (e: IllegalAccessException) {
                     call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
                 }

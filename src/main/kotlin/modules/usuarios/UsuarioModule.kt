@@ -5,6 +5,7 @@ import com.alilopez.modules.usuarios.application.usecase.ActualizarUseCase
 import com.alilopez.modules.usuarios.application.usecase.EliminarUseCase
 import com.alilopez.modules.usuarios.application.usecase.RegistrarAdminUseCase
 import com.alilopez.modules.usuarios.application.usecase.RegistrarUseCase
+import com.alilopez.modules.usuarios.application.usecase.VerEstadisticasUsuariosUseCase
 import com.alilopez.modules.usuarios.application.usecase.VerPerfilUseCase
 import com.alilopez.modules.usuarios.application.usecase.VerTodoUseCase
 import com.alilopez.modules.usuarios.domain.repository.UsuarioRepository
@@ -19,5 +20,6 @@ val usuarioModule = module {
     factory { VerPerfilUseCase(get()) }
     factory { VerTodoUseCase(get()) }
     factory { RegistrarAdminUseCase(get()) }
+    factory { VerEstadisticasUsuariosUseCase(get()) }
     single<UsuarioRepository> { PostgresUsuarioRepository() }
 }

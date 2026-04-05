@@ -1,6 +1,7 @@
 package com.alilopez.modules.usuarios.domain.repository
 
 import com.alilopez.modules.usuarios.domain.model.Usuario
+import com.alilopez.modules.usuarios.infrastructure.rest.dto.UsuarioEstadisticasResponse
 
 interface UsuarioRepository {
     suspend fun verTodos(): List<Usuario>
@@ -9,4 +10,5 @@ interface UsuarioRepository {
     suspend fun registrar(usuario: Usuario): Usuario?
     suspend fun actualizar(id: Int, usuario: Usuario): Usuario?
     suspend fun eliminar(id: Int): Boolean
+    suspend fun obtenerEstadisticasUsuarios(): UsuarioEstadisticasResponse
 }

@@ -1,5 +1,6 @@
 package com.alilopez.modules.reportes.domain.repository
 import com.alilopez.modules.reportes.domain.model.Reporte
+import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteEstadisticasResponse
 
 interface ReporteRepository {
     suspend fun buscarPorId(id: Int): Reporte?
@@ -9,4 +10,6 @@ interface ReporteRepository {
     suspend fun eliminar(id: Int): Boolean
     suspend fun buscarPorUsuario(idUsuario: Int, idEstado: Int?): List<Reporte>
     suspend fun actualizarEstado(id: Int, nuevoEstadoId: Int): Boolean
+    suspend fun obtenerEstadisticasUsuario(idUsuario: Int): ReporteEstadisticasResponse
+    suspend fun obtenerEstadisticasGlobales(): ReporteEstadisticasResponse
 }
