@@ -5,6 +5,9 @@ import com.alilopez.modules.catalogos.infrastructure.persistence.IncidenciaTable
 import com.alilopez.modules.reportes.domain.model.Reporte
 import com.alilopez.modules.reportes.domain.repository.ReporteRepository
 import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteEstadisticasResponse
+import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteMapaResponse
+import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteResponse
+import com.alilopez.modules.reportes.infrastructure.rest.dto.toResponse
 import com.alilopez.modules.usuarios.infrastructure.persistence.UsuarioTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -102,6 +105,33 @@ class PostgresReporteRepository : ReporteRepository {
         ReporteEstadisticasResponse(total, pendientes, enProceso, resueltos)
     }
 
+    override suspend fun obtenerReportesParaMapa(idEstado: Int?, idIncidencia: Int?): List<ReporteMapaResponse> = transaction {
+        val query = reporteTable.selectAll()
+
+        idEstado?.let { query.andWhere { reporteTable.idEstado eq it } }
+        idIncidencia?.let { query.andWhere { reporteTable.idIncidencia eq it } }
+
+        query.map {
+            ReporteMapaResponse(
+                idReporte = it[reporteTable.id],
+                latitud = it[reporteTable.latitud].toDouble(),
+                longitud = it[reporteTable.longitud].toDouble(),
+                idIncidencia = it[reporteTable.idIncidencia],
+                idEstado = it[reporteTable.idEstado],
+                titulo = it[reporteTable.titulo]
+            )
+        }
+    }
+
+
+    override suspend fun obtenerReportesDetallados(idEstado: Int?, idIncidencia: Int?): List<ReporteResponse> = transaction {
+        val query = reporteConNombres.selectAll()
+
+        idEstado?.let { query.andWhere { reporteTable.idEstado eq it } }
+        idIncidencia?.let { query.andWhere { reporteTable.idIncidencia eq it } }
+
+        query.map { it.toDomain().toResponse() }
+    }
     private fun ResultRow.toDomain() = Reporte(
         id_reporte = this[reporteTable.id],
         id_usuario = this[reporteTable.idUsuario],

@@ -25,6 +25,8 @@ fun Route.reporteRouting() {
     val actualizarEstadoUseCase by inject<ActualizarEstadoUseCase>()
     val verEstadisticasUsuarioUseCase by inject<VerEstadisticasUsuarioUseCase>()
     val verEstadisticasGlobalesUseCase by inject<VerEstadisticasGlobalesUseCase>()
+    val verReportesMapaUseCase by inject<VerReportesMapaUseCase>()
+    val verListaReportesAdminUseCase by inject<VerListaReportesAdminUseCase>()
 
     val cloudinaryService = CloudinaryService()
 
@@ -39,6 +41,39 @@ fun Route.reporteRouting() {
                 try {
                     val reportes = verReporteUseCase.execute(rol, estadoFiltro)
                     call.respond(HttpStatusCode.OK, reportes.map { it.toResponse() })
+                } catch (e: IllegalAccessException) {
+                    call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
+                }
+            }
+
+            get("/mapa") {
+                val principal = call.principal<JWTPrincipal>()
+                val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+
+                val idEstado = call.request.queryParameters["estado"]?.toIntOrNull()
+                val idIncidencia = call.request.queryParameters["incidencia"]?.toIntOrNull()
+
+                try {
+                    val puntos = verReportesMapaUseCase.execute(rol, idEstado, idIncidencia)
+                    call.respond(HttpStatusCode.OK, puntos)
+                } catch (e: IllegalAccessException) {
+                    call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, "Error al cargar puntos del mapa")
+                }
+            }
+
+            get("/admin/reportes") {
+                val principal = call.principal<JWTPrincipal>()
+                val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+
+                // Capturamos ambos filtros de la URL
+                val idEstado = call.request.queryParameters["estado"]?.toIntOrNull()
+                val idIncidencia = call.request.queryParameters["incidencia"]?.toIntOrNull()
+
+                try {
+                    val lista = verListaReportesAdminUseCase.execute(rol, idEstado, idIncidencia)
+                    call.respond(HttpStatusCode.OK, lista)
                 } catch (e: IllegalAccessException) {
                     call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
                 }

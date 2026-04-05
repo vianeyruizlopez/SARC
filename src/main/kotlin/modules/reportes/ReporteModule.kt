@@ -4,10 +4,12 @@ import com.alilopez.modules.reportes.application.usecase.ActualizarEstadoUseCase
 import com.alilopez.modules.reportes.application.usecase.ActualizarReporteUseCase
 import com.alilopez.modules.reportes.application.usecase.CrearReporteUseCase
 import com.alilopez.modules.reportes.application.usecase.EliminarReporteUseCase
+import com.alilopez.modules.reportes.application.usecase.VerListaReportesAdminUseCase
 import com.alilopez.modules.reportes.application.usecase.VerEstadisticasGlobalesUseCase
 import com.alilopez.modules.reportes.application.usecase.VerEstadisticasUsuarioUseCase
 import com.alilopez.modules.reportes.application.usecase.VerIdReporteUseCase
 import com.alilopez.modules.reportes.application.usecase.VerReporteUseCase
+import com.alilopez.modules.reportes.application.usecase.VerReportesMapaUseCase
 import com.alilopez.modules.reportes.application.usecase.VerReportesPorUsuarioUseCase
 import com.alilopez.modules.reportes.domain.repository.ReporteRepository
 import com.alilopez.modules.reportes.infrastructure.persistence.PostgresReporteRepository
@@ -23,6 +25,8 @@ val reporteModule = module {
     factory { ActualizarEstadoUseCase(get()) }
     factory { VerEstadisticasUsuarioUseCase(get ()) }
     factory { VerEstadisticasGlobalesUseCase(get()) }
+    factory { VerReportesMapaUseCase(get())}
+    factory { VerListaReportesAdminUseCase(get()) }
     single<ReporteRepository> { PostgresReporteRepository() }
 
 }
