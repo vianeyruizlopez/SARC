@@ -9,7 +9,8 @@ version = "0.0.1"
 
 
 application {
-    mainClass = "io.ktor.server.netty.EngineMain"
+    //mainClass = "io.ktor.server.netty.EngineMain"
+    mainClass.set("com.alilopez.ApplicationKt")
 }
 
 kotlin {
@@ -50,4 +51,6 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:2.3.12")
     //// implementation("io.ktor:ktor-server-auth-jwt:2.3.12")
    ////// implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+    //para cors
+    implementation("io.ktor:ktor-server-cors:2.3.12")
 }
