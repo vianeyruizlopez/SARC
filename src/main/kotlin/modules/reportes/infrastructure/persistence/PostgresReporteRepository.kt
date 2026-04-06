@@ -22,15 +22,23 @@ class PostgresReporteRepository : ReporteRepository {
         .innerJoin(EstadoReporteTable, { reporteTable.idEstado }, { EstadoReporteTable.id })
         .innerJoin(UsuarioTable, { reporteTable.idUsuario }, { UsuarioTable.id })
 
-    override suspend fun buscarTodos(idEstado: Int?): List<Reporte> = transaction {
-        val query = if (idEstado != null) {
-            reporteConNombres.select { reporteTable.idEstado eq idEstado }
-        } else {
-            reporteConNombres.selectAll()
+    override suspend fun buscarTodos(idEstado: Int?, queryTexto: String?): List<Reporte> = transaction {
+
+        val query = reporteConNombres.selectAll()
+
+        idEstado?.let {
+            query.andWhere { reporteTable.idEstado eq it }
         }
 
+        queryTexto?.let {
+            val term = "%${it.lowercase()}%"
+            query.andWhere {
+                reporteTable.titulo.lowerCase() like term
+            }
+        }
         query.map { it.toDomain() }
     }
+
 
     override suspend fun buscarPorId(id: Int): Reporte? = transaction {
         reporteConNombres.select { reporteTable.id eq id }
@@ -80,12 +88,19 @@ class PostgresReporteRepository : ReporteRepository {
         reporteTable.deleteWhere { reporteTable.id eq id } > 0
     }
 
-    override suspend fun buscarPorUsuario(idUsuario: Int, idEstado: Int?): List<Reporte> = transaction {
+    override suspend fun buscarPorUsuario(idUsuario: Int, idEstado: Int?, queryTexto: String?): List<Reporte> = transaction {
         val query = reporteConNombres.select { reporteTable.idUsuario eq idUsuario }
+
         idEstado?.let {
             query.andWhere { reporteTable.idEstado eq it }
         }
 
+        queryTexto?.let {
+            val term = "%${it.lowercase()}%"
+            query.andWhere {
+                reporteTable.titulo.lowerCase() like term
+            }
+        }
         query.map { it.toDomain() }
     }
 

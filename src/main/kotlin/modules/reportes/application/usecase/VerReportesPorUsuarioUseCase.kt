@@ -5,11 +5,11 @@ import com.alilopez.modules.reportes.domain.repository.ReporteRepository
 
 class VerReportesPorUsuarioUseCase(private val repository: ReporteRepository) {
 
-    suspend fun execute(idUsuario: Int, rol: Int, estadoFiltro: Int?): List<Reporte> {
+    suspend fun execute(idUsuario: Int, rol: Int, estadoFiltro: Int?, queryTexto: String?): List<Reporte> {
         if (rol != 2) {
             throw IllegalAccessException("No tienes permiso para ver estos reportes.")
         }
 
-        return repository.buscarPorUsuario(idUsuario, estadoFiltro)
+        return repository.buscarPorUsuario(idUsuario, estadoFiltro, queryTexto)
     }
 }

@@ -37,10 +37,12 @@ fun Route.reporteRouting() {
             get {
                 val principal = call.principal<JWTPrincipal>()
                 val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+
                 val estadoFiltro = call.request.queryParameters["estado"]?.toIntOrNull()
+                val textoBusqueda = call.request.queryParameters["q"]
 
                 try {
-                    val reportes = verReporteUseCase.execute(rol, estadoFiltro)
+                    val reportes = verReporteUseCase.execute(rol, estadoFiltro, textoBusqueda)
                     call.respond(HttpStatusCode.OK, reportes.map { it.toResponse() })
                 } catch (e: IllegalAccessException) {
                     call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
@@ -68,7 +70,6 @@ fun Route.reporteRouting() {
                 val principal = call.principal<JWTPrincipal>()
                 val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
 
-                // Capturamos ambos filtros de la URL
                 val idEstado = call.request.queryParameters["estado"]?.toIntOrNull()
                 val idIncidencia = call.request.queryParameters["incidencia"]?.toIntOrNull()
 
@@ -130,16 +131,23 @@ fun Route.reporteRouting() {
                 val principal = call.principal<JWTPrincipal>()
                 val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
 
+                val idUsuarioToken = principal?.payload?.getClaim("id")?.asInt() ?: 0
                 val idUsuarioPath = call.parameters["idUsuario"]?.toIntOrNull()
+
                 val estadoFiltro = call.request.queryParameters["estado"]?.toIntOrNull()
+                val textoBusqueda = call.request.queryParameters["q"]
 
                 if (idUsuarioPath == null) {
                     call.respond(HttpStatusCode.BadRequest, "ID de usuario no válido")
                     return@get
                 }
+                if (rol == 2 && idUsuarioPath != idUsuarioToken) {
+                    call.respond(HttpStatusCode.Forbidden, "No puedes ver reportes de otros usuarios")
+                    return@get
+                }
 
                 try {
-                    val misReportes = verPorUsuarioUseCase.execute(idUsuarioPath, rol, estadoFiltro)
+                    val misReportes = verPorUsuarioUseCase.execute(idUsuarioPath, rol, estadoFiltro, textoBusqueda)
                     call.respond(HttpStatusCode.OK, misReportes.map { it.toResponse() })
                 } catch (e: IllegalAccessException) {
                     call.respond(HttpStatusCode.Forbidden, e.message ?: "Acceso denegado")
@@ -149,10 +157,17 @@ fun Route.reporteRouting() {
             get("/usuario/{idUsuario}/estadisticas") {
                 val principal = call.principal<JWTPrincipal>()
                 val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+
+                val idUsuarioToken = principal?.payload?.getClaim("id")?.asInt() ?: 0
                 val idUsuarioPath = call.parameters["idUsuario"]?.toIntOrNull()
 
                 if (idUsuarioPath == null) {
                     call.respond(HttpStatusCode.BadRequest, "ID de usuario inválido")
+                    return@get
+                }
+
+                if (rol == 2 && idUsuarioPath != idUsuarioToken) {
+                    call.respond(HttpStatusCode.Forbidden, "No puedes ver estadísticas de otros usuarios")
                     return@get
                 }
 

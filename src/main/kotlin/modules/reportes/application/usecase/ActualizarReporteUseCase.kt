@@ -5,10 +5,8 @@ import com.alilopez.modules.reportes.domain.repository.ReporteRepository
 
 class ActualizarReporteUseCase(private val repository: ReporteRepository) {
     suspend fun execute(id: Int, datosNuevos: Reporte): Reporte? {
-        // 1. Usamos 'buscarPorId' (como dice tu interfaz)
         val reporteActual = repository.buscarPorId(id) ?: return null
 
-        // 2. Lógica de mezcla
         val reporteMezclado = reporteActual.copy(
             titulo = if (datosNuevos.titulo.isNotEmpty()) datosNuevos.titulo else reporteActual.titulo,
             descripcion = if (datosNuevos.descripcion.isNotEmpty()) datosNuevos.descripcion else reporteActual.descripcion,

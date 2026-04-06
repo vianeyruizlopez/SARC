@@ -7,11 +7,11 @@ import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteResponse
 
 interface ReporteRepository {
     suspend fun buscarPorId(id: Int): Reporte?
-    suspend fun buscarTodos(idEstado: Int?): List<Reporte>
+    suspend fun buscarTodos(idEstado: Int?, queryTexto: String?): List<Reporte>
     suspend fun guardar(reporte: Reporte): Reporte
     suspend fun actualizar(id: Int, reporte: Reporte): Reporte?
     suspend fun eliminar(id: Int): Boolean
-    suspend fun buscarPorUsuario(idUsuario: Int, idEstado: Int?): List<Reporte>
+    suspend fun buscarPorUsuario(idUsuario: Int, idEstado: Int?, queryTexto: String?): List<Reporte>
     suspend fun actualizarEstado(id: Int, nuevoEstadoId: Int): Boolean
     suspend fun obtenerEstadisticasUsuario(idUsuario: Int): ReporteEstadisticasResponse
     suspend fun obtenerEstadisticasGlobales(): ReporteEstadisticasResponse
