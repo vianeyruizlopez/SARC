@@ -27,6 +27,7 @@ fun Route.reporteRouting() {
     val verEstadisticasGlobalesUseCase by inject<VerEstadisticasGlobalesUseCase>()
     val verReportesMapaUseCase by inject<VerReportesMapaUseCase>()
     val verListaReportesAdminUseCase by inject<VerListaReportesAdminUseCase>()
+    val verEstadisticasAdmiUseCase by inject<VerEstadisticasAdmiUseCase>()
 
     val cloudinaryService = CloudinaryService()
 
@@ -163,6 +164,21 @@ fun Route.reporteRouting() {
                 }
             }
 
+
+            get("/estadisticas/globalAdmi") {
+                val principal = call.principal<JWTPrincipal>()
+                val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+
+                try {
+                    val estadisticas = verEstadisticasAdmiUseCase.execute(rol)
+                    call.respond(HttpStatusCode.OK, estadisticas)
+                } catch (e: IllegalAccessException) {
+                    call.respond(HttpStatusCode.Forbidden, e.message ?: "No tienes permisos")
+                } catch (e: Exception) {
+                    println("Error en Estadísticas Globales: ${e.message}")
+                    call.respond(HttpStatusCode.InternalServerError, "Error al generar estadísticas")
+                }
+            }
 
             get("/estadisticas/global") {
                 val principal = call.principal<JWTPrincipal>()

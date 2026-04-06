@@ -4,6 +4,8 @@ import com.alilopez.modules.catalogos.infrastructure.persistence.EstadoReporteTa
 import com.alilopez.modules.catalogos.infrastructure.persistence.IncidenciaTable
 import com.alilopez.modules.reportes.domain.model.Reporte
 import com.alilopez.modules.reportes.domain.repository.ReporteRepository
+import com.alilopez.modules.reportes.infrastructure.rest.dto.CategoriaEstadistica
+import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteEstadisticasGlobalResponse
 import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteEstadisticasResponse
 import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteMapaResponse
 import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteResponse
@@ -132,6 +134,34 @@ class PostgresReporteRepository : ReporteRepository {
 
         query.map { it.toDomain().toResponse() }
     }
+
+    override suspend fun obtenerEstadisticasCompletas(): ReporteEstadisticasGlobalResponse = transaction {
+        val total = reporteTable.selectAll().count()
+        val pendientes = reporteTable.select { reporteTable.idEstado eq 1 }.count()
+        val enProceso = reporteTable.select { reporteTable.idEstado eq 2 }.count()
+        val resueltos = reporteTable.select { reporteTable.idEstado eq 3 }.count()
+
+        val porCategoria = (reporteTable innerJoin IncidenciaTable)
+            .slice(IncidenciaTable.nombre, reporteTable.id.count())
+            .selectAll()
+            .groupBy(IncidenciaTable.nombre)
+            .map {
+                CategoriaEstadistica(
+                    nombre = it[IncidenciaTable.nombre],
+                    cantidad = it[reporteTable.id.count()]
+                )
+            }
+
+        ReporteEstadisticasGlobalResponse(
+            total = total,
+            pendientes = pendientes,
+            enProceso = enProceso,
+            resueltos = resueltos,
+            activos = pendientes + enProceso,
+            porCategoria = porCategoria
+        )
+    }
+
     private fun ResultRow.toDomain() = Reporte(
         id_reporte = this[reporteTable.id],
         id_usuario = this[reporteTable.idUsuario],

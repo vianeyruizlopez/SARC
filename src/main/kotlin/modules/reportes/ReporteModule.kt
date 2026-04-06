@@ -4,6 +4,7 @@ import com.alilopez.modules.reportes.application.usecase.ActualizarEstadoUseCase
 import com.alilopez.modules.reportes.application.usecase.ActualizarReporteUseCase
 import com.alilopez.modules.reportes.application.usecase.CrearReporteUseCase
 import com.alilopez.modules.reportes.application.usecase.EliminarReporteUseCase
+import com.alilopez.modules.reportes.application.usecase.VerEstadisticasAdmiUseCase
 import com.alilopez.modules.reportes.application.usecase.VerListaReportesAdminUseCase
 import com.alilopez.modules.reportes.application.usecase.VerEstadisticasGlobalesUseCase
 import com.alilopez.modules.reportes.application.usecase.VerEstadisticasUsuarioUseCase
@@ -27,6 +28,7 @@ val reporteModule = module {
     factory { VerEstadisticasGlobalesUseCase(get()) }
     factory { VerReportesMapaUseCase(get())}
     factory { VerListaReportesAdminUseCase(get()) }
+    factory { VerEstadisticasAdmiUseCase(get()) }
     single<ReporteRepository> { PostgresReporteRepository() }
 
 }

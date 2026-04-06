@@ -1,5 +1,6 @@
 package com.alilopez.modules.reportes.domain.repository
 import com.alilopez.modules.reportes.domain.model.Reporte
+import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteEstadisticasGlobalResponse
 import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteEstadisticasResponse
 import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteMapaResponse
 import com.alilopez.modules.reportes.infrastructure.rest.dto.ReporteResponse
@@ -16,4 +17,5 @@ interface ReporteRepository {
     suspend fun obtenerEstadisticasGlobales(): ReporteEstadisticasResponse
     suspend fun obtenerReportesParaMapa(idEstado: Int?, idIncidencia: Int?): List<ReporteMapaResponse>
     suspend fun obtenerReportesDetallados(idEstado: Int?, idIncidencia: Int?): List<ReporteResponse>
+    suspend fun obtenerEstadisticasCompletas(): ReporteEstadisticasGlobalResponse
 }
