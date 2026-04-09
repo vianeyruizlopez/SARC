@@ -44,13 +44,16 @@ class PostgresUsuarioRepository : UsuarioRepository {
         val total = UsuarioTable.selectAll().count()
 
         val admins = UsuarioTable.select {
-            (UsuarioTable.idRol eq 1) or (UsuarioTable.idRol eq 3)
+            UsuarioTable.idRol eq 1
         }.count()
         val ciudadanos = UsuarioTable.select {
             UsuarioTable.idRol eq 2
         }.count()
+        val superAdmi= UsuarioTable.select{
+            UsuarioTable.idRol eq 3
+        }.count()
 
-        UsuarioEstadisticasResponse(total, admins, ciudadanos)
+        UsuarioEstadisticasResponse(total, admins, ciudadanos, superAdmi)
     }
 
     override suspend fun registrar(usuario: Usuario): Usuario? = newSuspendedTransaction {

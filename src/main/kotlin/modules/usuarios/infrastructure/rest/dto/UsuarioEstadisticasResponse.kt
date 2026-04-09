@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class UsuarioEstadisticasResponse(
     val totalUsuarios: Long,
     val administradores: Long,
-    val ciudadanos: Long
+    val ciudadanos: Long,
+    val superAdmi: Long
 )

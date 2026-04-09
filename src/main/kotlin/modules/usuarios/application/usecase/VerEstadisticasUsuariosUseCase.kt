@@ -5,7 +5,7 @@ import com.alilopez.modules.usuarios.infrastructure.rest.dto.UsuarioEstadisticas
 
 class VerEstadisticasUsuariosUseCase(private val repository: UsuarioRepository) {
     suspend fun execute(rol: Int): UsuarioEstadisticasResponse {
-        println("DEBUG: El UseCase recibió el rol: $rol") // <--- AGREGA ESTO
+        println("DEBUG: El UseCase recibió el rol: $rol")
         if (rol != 3) {
             throw IllegalAccessException("Acceso restringido...")
         }

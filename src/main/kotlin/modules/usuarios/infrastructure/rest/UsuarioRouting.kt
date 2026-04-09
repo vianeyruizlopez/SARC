@@ -12,7 +12,6 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import com.alilopez.modules.usuarios.infrastructure.rest.dto.GoogleLoginRequest
 import com.alilopez.modules.usuarios.application.usecase.VerEstadisticasUsuariosUseCase
@@ -129,6 +128,18 @@ fun Route.usuarioRouting() {
 
                 if (rol == 3) {
                     val lista = verTodoUseCase.execute(rol, filtroTipo = 2)
+                    call.respond(lista.map { it.toResponse() })
+                } else {
+                    call.respond(HttpStatusCode.Forbidden, "Acceso denegado")
+                }
+            }
+
+            get("/superadmi") {
+                val principal = call.principal<JWTPrincipal>()
+                val rol = principal?.payload?.getClaim("idRol")?.asInt() ?: 0
+
+                if (rol == 3) {
+                    val lista = verTodoUseCase.execute(rol, filtroTipo = 3)
                     call.respond(lista.map { it.toResponse() })
                 } else {
                     call.respond(HttpStatusCode.Forbidden, "Acceso denegado")
