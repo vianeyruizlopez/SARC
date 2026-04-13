@@ -8,21 +8,26 @@ import com.alilopez.modules.catalogos.infrastructure.persistence.EstadoReporteTa
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.github.cdimascio.dotenv.dotenv
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object DatabaseFactory {
     fun init() {
+        val dotenv = dotenv {
+            ignoreIfMissing = true
+        }
         val config = HikariConfig().apply {
             driverClassName = "org.postgresql.Driver"
 
-            // Leemos del .env. Si no existe, usamos un valor por defecto (el ?: "...")
-            jdbcUrl = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/SARC-2"
-            username = System.getenv("DB_USER") ?: "postgres"
-            password = System.getenv("DB_PASSWORD") ?: "root"
-
+            jdbcUrl = dotenv["DB_URL"] ?: System.getenv("DB_URL")
+            username = dotenv["DB_USER"] ?: System.getenv("DB_USER")
+            password = dotenv["DB_PASSWORD"] ?: System.getenv("DB_PASSWORD")
             maximumPoolSize = 10
+            if (jdbcUrl == null) {
+                throw IllegalArgumentException("¡ERROR! No se encontró la URL de la base de datos en el .env")
+            }
         }
         val dataSource = HikariDataSource(config)
         Database.connect(dataSource)
