@@ -11,6 +11,8 @@ data class UsuarioRequests(
     val segundoApellido: String,
     val email: String,
     val contrasena: String?,
+    val googleId: String?,
+    val edad: Int,
     val idRol: Int
 ){
     fun toDomain()= Usuario(
@@ -20,6 +22,8 @@ data class UsuarioRequests(
         segundoApellido = segundoApellido,
         email = email,
         contrasena = contrasena,
+        googleId = googleId,
+        edad = edad,
         idRol= idRol
     )
 }

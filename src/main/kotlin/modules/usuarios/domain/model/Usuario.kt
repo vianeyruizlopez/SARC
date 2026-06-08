@@ -5,11 +5,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Usuario(
     val id: Int? = null,
-    val nombre: String? = null,
-    val primerApellido: String? = null,
-    val segundoApellido: String? = null,
-    val email: String? = null,
+    val nombre: String,
+    val primerApellido: String,
+    val segundoApellido: String,
+    val email: String,
     val contrasena: String? = null,
-    val idRol: Int? = null,
+    val googleId: String? = null,
+    val edad: Int? = null,
+    val idRol: Int,
     val nombreRol: String? = null
 )

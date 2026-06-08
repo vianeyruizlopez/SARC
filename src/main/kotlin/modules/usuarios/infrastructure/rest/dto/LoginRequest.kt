@@ -1,4 +1,4 @@
-package com.alilopez.modules.autentificacion.infrastructure.rest.dto
+package com.alilopez.modules.usuarios.infrastructure.rest.dto
 
 import kotlinx.serialization.Serializable
 
