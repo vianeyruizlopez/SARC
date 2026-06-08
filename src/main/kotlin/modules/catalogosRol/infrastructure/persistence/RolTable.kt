@@ -1,9 +1,9 @@
 package com.alilopez.modules.catalogosRol.infrastructure.persistence
-import org.jetbrains.exposed.sql.Table
 
+import org.jetbrains.exposed.sql.Table
 object RolTable : Table("rol") {
-    val id = integer("id_rol").autoIncrement()
-    val nombre = varchar("nombre", 100)
+    val id = integer("idRol").autoIncrement()
+    val nombre = varchar("nombreRol", 50)
 
     override val primaryKey = PrimaryKey(id)
 }

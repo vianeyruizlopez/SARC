@@ -6,15 +6,17 @@ import io.ktor.server.auth.jwt.*
 
 fun Application.configureSecurity() {
     install(Authentication) {
-        jwt("auth-jwt") { // Nombre de nuestro filtro de seguridad
-            verifier(JwtConfig.verifier) // Usamos el verificador que creamos arriba
+        jwt("auth-jwt") {
+            verifier(JwtConfig.verifier)
             validate { credential ->
-                val id = credential.payload.getClaim("id").asInt()
-                val rol = credential.payload.getClaim("idRol").asInt()
+                val idClaim = credential.payload.getClaim("id")
+                val rolClaim = credential.payload.getClaim("idRol")
 
-                if (id != null && rol != null) {
+                if (!idClaim.isNull && !rolClaim.isNull) {
                     JWTPrincipal(credential.payload)
-                } else null
+                } else {
+                    null
+                }
             }
         }
     }

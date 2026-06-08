@@ -5,27 +5,23 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UsuarioResponse(
-    val id: Int?,
+    val id: Int,
     val nombre: String,
     val primerApellido: String,
     val segundoApellido: String,
     val email: String,
     val contrasena: String?,
-    val googleId: String?,
-    val edad: Int?,
     val idRol: Int,
     val nombreRol: String
 )
 
 fun Usuario.toResponse() = UsuarioResponse(
-    id = id ?: 0,
-    nombre = nombre,
-    primerApellido = primerApellido,
-    segundoApellido = segundoApellido,
-    email = email,
+    id = this.id ?: 0,
+    nombre = this.nombre ?: "",
+    primerApellido = this.primerApellido ?: "",
+    segundoApellido = this.segundoApellido ?: "",
+    email = this.email ?: "",
     contrasena = null,
-    googleId = googleId,
-    edad = edad,
-    idRol = idRol,
+    idRol = this.idRol ?: 0,
     nombreRol = this.nombreRol ?: "Sin Rol"
 )

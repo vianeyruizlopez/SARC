@@ -2,8 +2,8 @@ package com.alilopez
 
 import com.alilopez.common.infrastructure.DatabaseFactory
 import com.alilopez.common.infrastructure.security.configureSecurity
-import com.alilopez.modules.reportes.infrastructure.rest.reporteRouting
-import com.alilopez.modules.reportes.reporteModule
+import com.alilopez.modules.autentificacion.infrastructure.rest.autentificacionModule
+import com.alilopez.modules.autentificacion.infrastructure.rest.autentificacionRoutes
 import com.alilopez.modules.usuarios.infrastructure.rest.usuarioRouting
 import com.alilopez.modules.usuarios.usuarioModule
 import io.ktor.http.HttpHeaders
@@ -13,8 +13,6 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.routing
-import modules.products.infrastructure.productModule
-import modules.products.infrastructure.rest.productRoutes
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 import io.ktor.server.plugins.cors.routing.*
@@ -40,7 +38,7 @@ fun Application.module() {
 
     install(Koin) {
         slf4jLogger() // Opcional: para ver logs de Koin
-        modules(productModule, reporteModule, usuarioModule)
+        modules( usuarioModule,autentificacionModule)
     }
 
     // 2. Configuración de Serialización (Content Negotiation)
@@ -50,9 +48,8 @@ fun Application.module() {
 
     // 3. Registro de Rutas
     routing {
-        productRoutes()
-        reporteRouting()
         usuarioRouting()
+        autentificacionRoutes()
 
     }
 }

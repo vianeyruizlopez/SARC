@@ -1,10 +1,7 @@
 package com.alilopez.common.infrastructure
 
-import com.alilopez.modules.reportes.infrastructure.persistence.reporteTable
 import com.alilopez.modules.usuarios.infrastructure.persistence.UsuarioTable
 import com.alilopez.modules.catalogosRol.infrastructure.persistence.RolTable
-import com.alilopez.modules.catalogos.infrastructure.persistence.IncidenciaTable
-import com.alilopez.modules.catalogos.infrastructure.persistence.EstadoReporteTable
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -19,7 +16,7 @@ object DatabaseFactory {
             ignoreIfMissing = true
         }
         val config = HikariConfig().apply {
-            driverClassName = "org.postgresql.Driver"
+            driverClassName = "com.mysql.cj.jdbc.Driver"
 
             jdbcUrl = dotenv["DB_URL"] ?: System.getenv("DB_URL")
             username = dotenv["DB_USER"] ?: System.getenv("DB_USER")
@@ -35,10 +32,7 @@ object DatabaseFactory {
         transaction {
             SchemaUtils.create(
                 RolTable,
-                IncidenciaTable,
-                EstadoReporteTable,
-                UsuarioTable,
-                reporteTable
+                UsuarioTable
             )
         }
     }

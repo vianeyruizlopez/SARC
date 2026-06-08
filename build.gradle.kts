@@ -4,13 +4,12 @@ plugins {
     alias(libs.plugins.ktor)
 }
 
-group = "com.alilopez"
+group = "com.vianeyruiz"
 version = "0.0.1"
 
 
 application {
-    //mainClass = "io.ktor.server.netty.EngineMain"
-    mainClass.set("com.alilopez.ApplicationKt")
+    mainClass.set("io.ktor.server.netty.EngineMain")
 }
 
 kotlin {
@@ -20,7 +19,6 @@ kotlin {
 dependencies {
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.swagger)
-    //implementation(libs.ktor.server.routing.openapi)
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger.slf4j)
     implementation(libs.ktor.server.netty)
@@ -31,11 +29,10 @@ dependencies {
 
     // Koin para Ktor
     implementation("io.insert-koin:koin-ktor:3.5.0")
-    //implementation("io.insert-koin:koin-logger-slf4j:3.5.0")
 
     // Base de Datos
     implementation(libs.bundles.exposed)
-    implementation(libs.postgresql)
+    implementation("com.mysql:mysql-connector-j:9.0.0")
     implementation(libs.hikaricp)
 
     ///claudinary
@@ -43,14 +40,26 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     // Serialization
     implementation(libs.ktor.serialization.kotlinx.json)
-    //implementation("io.ktor:ktor-server-content-negotiation-jvm")
-    //implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
-    ///token y firebase
     ///token y firebase
     implementation("com.google.firebase:firebase-admin:9.3.0")
     implementation("io.ktor:ktor-server-auth-jwt:2.3.12")
-    //// implementation("io.ktor:ktor-server-auth-jwt:2.3.12")
-   ////// implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
     //para cors
     implementation("io.ktor:ktor-server-cors:2.3.12")
+    //encriptar contrasena
+    implementation("org.mindrot:jbcrypt:0.4")
+}
+tasks.shadowJar {
+    archiveClassifier.set("all")
+
+    manifest {
+        attributes(
+            "Main-Class" to "io.ktor.server.netty.EngineMain"
+        )
+    }
+
+    mergeServiceFiles()
+}
+
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
